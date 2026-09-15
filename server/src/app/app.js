@@ -1,0 +1,17 @@
+import express from "express"
+import complaintRoutes from "../routes/complaint.routes.js"
+
+const app = express();
+
+app.use(express.json())
+
+app.use("/api/complaint", complaintRoutes)
+
+app.get("/", (req, res) => {
+    res.send("API is working properly")
+})
+
+
+
+
+export default app;
