@@ -6,8 +6,6 @@ import TokenProvider from '../context/TokenContext';
 
 const App = () => {
   
-
-
   return (
     <>
     <TokenProvider>
