@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_BACKEND_URI,
+          target: env.VITE_BACKEND_URI || "https://complaint-box-dwov.onrender.com/",
         }
       }
     }
