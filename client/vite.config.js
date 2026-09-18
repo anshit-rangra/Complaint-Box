@@ -4,14 +4,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  console.log("Backend ", env.VITE_BACKEND_URI)
   return {
     plugins: [react(), tailwindcss()],
 
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_BACKEND_URI || "https://complaint-box-dwov.onrender.com/",
+          target:  "https://complaint-box-dwov.onrender.com/" || env.VITE_BACKEND_URI ,
         }
       }
     }
