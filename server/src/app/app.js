@@ -10,7 +10,8 @@ app.use(express.json())
 
 
 app.use(cors({
-  origin: config.FRONTEND_URI
+  origin: config.FRONTEND_URI,
+  credentials: true
 }));
 
 app.use("/api/complaint", complaintRoutes)
