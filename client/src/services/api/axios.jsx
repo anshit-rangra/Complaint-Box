@@ -1,16 +1,11 @@
 import axios from 'axios';
-import { defineConfig, loadEnv } from 'vite'
-
-
-  const env = loadEnv(mode, process.cwd(), '')
-  
 
 const api = axios.create({
-    baseURL: "https://complaint-box-delta.vercel.app/api" || env.VITE_FRONTEND_URI  ,
+    baseURL: `${import.meta.env.VITE_FRONTEND_URI}/api`,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json"
     }
-})
+});
 
 export default api;
