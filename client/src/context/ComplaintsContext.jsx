@@ -10,8 +10,11 @@ const ComplaintsProvider = ({ children }) => {
     const [complaintsData, setComplaintsData] = useState(null)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [loading, setLoading] = useState(true)
 
     const fetchComplaints = useCallback(async (page = 1) => {
+
+        setLoading(true)
 
         const res = await getComplaints(COMPLAINTS_PER_PAGE, page)
 
@@ -20,6 +23,8 @@ const ComplaintsProvider = ({ children }) => {
             setCurrentPage(page)
             setTotalPages(Math.max(1, Math.ceil(res.data.total / COMPLAINTS_PER_PAGE)))
         }
+
+        setLoading(false)
 
     }, [])
 
@@ -36,8 +41,9 @@ const ComplaintsProvider = ({ children }) => {
         setCurrentPage,
         totalPages,
         setTotalPages,
+        loading,
         fetchComplaints
-    }), [complaintsData, currentPage, totalPages, fetchComplaints])
+    }), [complaintsData, currentPage, totalPages, loading, fetchComplaints])
 
     return (
             <complaintsContext.Provider value={value}>

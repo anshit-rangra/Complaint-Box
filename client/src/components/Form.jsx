@@ -6,6 +6,7 @@ import { complaintsContext } from '../context/ComplaintsContext'
 const Form = ({ onClose }) => {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { setComplaintsData } = useContext(complaintsContext)
 
   const notify = (m) => toast(m);
@@ -16,7 +17,9 @@ const Form = ({ onClose }) => {
 
     try {
       if (!title.trim() || !body.trim()) return
-      
+
+      setSubmitting(true)
+
       const { data } = await postComplaint(title, body)
       notify(data.message)
 
@@ -35,6 +38,7 @@ const Form = ({ onClose }) => {
 
     } finally {
 
+    setSubmitting(false)
     setTitle('')
     setBody('')
     onClose()
@@ -92,9 +96,11 @@ const Form = ({ onClose }) => {
 
         <button
           type="submit"
-          className="mt-5 w-full cursor-pointer rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-opacity hover:opacity-90"
+          disabled={submitting}
+          className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Submit Complaint
+          {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+          {submitting ? "Submitting..." : "Submit Complaint"}
         </button>
       </form>
     </div>

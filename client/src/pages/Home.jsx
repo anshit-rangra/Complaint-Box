@@ -6,6 +6,7 @@ import { ReadMoreText } from '../utils/helperFunction'
 import { likeComplaint } from '../services/api/complaintApi'
 import { toast } from 'react-toastify'
 import Pagination from '../components/Pagination'
+import Loader from '../components/Loader'
 
 
 
@@ -13,8 +14,9 @@ import Pagination from '../components/Pagination'
 const Home = () => {
 
   const notify = (m) => toast(m);
-  const { complaintsData, setComplaintsData, currentPage, totalPages, fetchComplaints } = useContext(complaintsContext)
+  const { complaintsData, setComplaintsData, currentPage, totalPages, loading, fetchComplaints } = useContext(complaintsContext)
   const [showForm, setShowForm] = useState(false)
+  const [likeId, setLikeId] = useState(null)
 
   const handlePageChange = (page) => {
     if (page === currentPage || page < 1 || page > totalPages) return
@@ -40,6 +42,7 @@ const Home = () => {
 
     let index = complaintsData.complaints.findIndex(e => e._id === id)
 
+    setLikeId(id)
 
     const res = await likeComplaint(id)
 
@@ -64,6 +67,8 @@ const Home = () => {
 
     notify(res.message)
 
+    setLikeId(null)
+
   }
 
 
@@ -87,7 +92,10 @@ const Home = () => {
           </div>
 
           <div className="mt-6 space-y-4">
-            {complaintsData && complaintsData?.complaints?.map((complaint) => (
+            {loading ? (
+              <Loader text="Loading complaints..." />
+            ) : (
+              complaintsData && complaintsData?.complaints?.map((complaint) => (
               <article
                 key={complaint._id}
                 data-id={complaint._id}
@@ -105,14 +113,19 @@ const Home = () => {
                   <ReadMoreText text={complaint.description} />
                 </div>
 
-                <button onClick={handleLikeClick}  className="flex shrink-0 cursor-pointer items-center gap-1.5 self-start rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300 sm:self-auto" value={complaint.likes}>
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M7 10v12M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88z" />
-                  </svg>
+                <button onClick={handleLikeClick} disabled={likeId === complaint._id} className="flex shrink-0 cursor-pointer items-center gap-1.5 self-start rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-60 sm:self-auto" value={complaint.likes}>
+                  {likeId === complaint._id ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-indigo-400" />
+                  ) : (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 10v12M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88z" />
+                    </svg>
+                  )}
                   {complaint.likes}
                 </button>
               </article>
-            ))}
+              ))
+            )}
           </div>
 
           <Pagination

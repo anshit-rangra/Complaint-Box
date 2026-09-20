@@ -5,6 +5,7 @@ import { ReadMoreText } from '../utils/helperFunction'
 import { deleteComplaint, COMPLAINTS_PER_PAGE } from '../services/api/complaintApi'
 import { toast } from 'react-toastify'
 import Pagination from '../components/Pagination'
+import Loader from '../components/Loader'
 
 const ADMIN_PASSWORD = "anshit"
 const ADMIN_AUTH_KEY = "admin_unlocked"
@@ -76,8 +77,9 @@ const AdminGate = ({ onUnlock }) => {
 const Admin = () => {
 
   const notify = (m) => toast(m);
-  const { complaintsData, setComplaintsData, currentPage, totalPages, setTotalPages, fetchComplaints } = useContext(complaintsContext)
+  const { complaintsData, setComplaintsData, currentPage, totalPages, setTotalPages, loading, fetchComplaints } = useContext(complaintsContext)
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem(ADMIN_AUTH_KEY) === "true")
+  const [deletingId, setDeletingId] = useState(null)
 
   const handlePageChange = (page) => {
     if (page === currentPage || page < 1 || page > totalPages) return
@@ -98,6 +100,8 @@ const Admin = () => {
 
     const id = e.currentTarget.closest("article").dataset.id
 
+    setDeletingId(id)
+
     const res = await deleteComplaint(id)
 
     let newArr = complaintsData?.complaints.filter(elem => elem._id !== id)
@@ -115,6 +119,8 @@ const Admin = () => {
     }
 
     notify(res.message)
+
+    setDeletingId(null)
 
   }
 
@@ -146,7 +152,10 @@ const Admin = () => {
             </div>
 
             <div className="mt-6 space-y-4">
-              {complaintsData && complaintsData?.complaints?.map((complaint) => (
+              {loading ? (
+                <Loader text="Loading complaints..." />
+              ) : (
+                  complaintsData && complaintsData?.complaints?.map((complaint) => (
                 <article
                   key={complaint._id}
                   data-id={complaint._id}
@@ -164,15 +173,20 @@ const Admin = () => {
                     <ReadMoreText text={complaint.description} />
                   </div>
 
-                  <button onClick={handleDeleteClick} className="flex shrink-0 cursor-pointer items-center gap-1.5 self-start rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition-colors hover:bg-red-500/20 hover:text-red-300 sm:self-auto">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14M10 11v6M14 11v6" />
-                    </svg>
+                  <button onClick={handleDeleteClick} disabled={deletingId === complaint._id} className="flex shrink-0 cursor-pointer items-center gap-1.5 self-start rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-300 transition-colors hover:bg-red-500/20 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60 sm:self-auto">
+                    {deletingId === complaint._id ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-red-400" />
+                    ) : (
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14M10 11v6M14 11v6" />
+                      </svg>
+                    )}
                     Delete
                   </button>
 </article>
-            ))}
-          </div>
+                ))
+              )}
+            </div>
 
           <Pagination
             currentPage={currentPage}
