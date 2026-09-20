@@ -5,6 +5,7 @@ import { complaintsContext } from '../context/ComplaintsContext'
 import { ReadMoreText } from '../utils/helperFunction'
 import { likeComplaint } from '../services/api/complaintApi'
 import { toast } from 'react-toastify'
+import Pagination from '../components/Pagination'
 
 
 
@@ -12,8 +13,23 @@ import { toast } from 'react-toastify'
 const Home = () => {
 
   const notify = (m) => toast(m);
-  const { complaintsData, setComplaintsData } = useContext(complaintsContext)
+  const { complaintsData, setComplaintsData, currentPage, totalPages, fetchComplaints } = useContext(complaintsContext)
   const [showForm, setShowForm] = useState(false)
+
+  const handlePageChange = (page) => {
+    if (page === currentPage || page < 1 || page > totalPages) return
+    fetchComplaints(page)
+  }
+
+  const handlePrevClick = () => {
+    if (currentPage <= 1) return
+    fetchComplaints(currentPage - 1)
+  }
+
+  const handleNextClick = () => {
+    if (currentPage >= totalPages) return
+    fetchComplaints(currentPage + 1)
+  }
 
   const handleLikeClick = async (e) => {
 
@@ -98,6 +114,14 @@ const Home = () => {
               </article>
             ))}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            onPrevClick={handlePrevClick}
+            onNextClick={handleNextClick}
+          />
         </section>
       </main>
     </div>

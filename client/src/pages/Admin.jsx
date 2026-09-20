@@ -2,8 +2,9 @@ import { useContext, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { complaintsContext } from '../context/ComplaintsContext'
 import { ReadMoreText } from '../utils/helperFunction'
-import { deleteComplaint } from '../services/api/complaintApi'
+import { deleteComplaint, COMPLAINTS_PER_PAGE } from '../services/api/complaintApi'
 import { toast } from 'react-toastify'
+import Pagination from '../components/Pagination'
 
 const ADMIN_PASSWORD = "anshit"
 const ADMIN_AUTH_KEY = "admin_unlocked"
@@ -75,8 +76,23 @@ const AdminGate = ({ onUnlock }) => {
 const Admin = () => {
 
   const notify = (m) => toast(m);
-  const { complaintsData, setComplaintsData } = useContext(complaintsContext)
+  const { complaintsData, setComplaintsData, currentPage, totalPages, setTotalPages, fetchComplaints } = useContext(complaintsContext)
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem(ADMIN_AUTH_KEY) === "true")
+
+  const handlePageChange = (page) => {
+    if (page === currentPage || page < 1 || page > totalPages) return
+    fetchComplaints(page)
+  }
+
+  const handlePrevClick = () => {
+    if (currentPage <= 1) return
+    fetchComplaints(currentPage - 1)
+  }
+
+  const handleNextClick = () => {
+    if (currentPage >= totalPages) return
+    fetchComplaints(currentPage + 1)
+  }
 
   const handleDeleteClick = async (e) => {
 
@@ -86,9 +102,17 @@ const Admin = () => {
 
     let newArr = complaintsData?.complaints.filter(elem => elem._id !== id)
 
+    const newTotal = complaintsData.total - 1
+
     setComplaintsData(prev => {
-      return { ...prev, complaints: newArr, total: prev.total - 1 }
+      return { ...prev, complaints: newArr, total: newTotal }
     })
+
+    setTotalPages(Math.max(1, Math.ceil(newTotal / COMPLAINTS_PER_PAGE)))
+
+    if (newArr.length === 0 && currentPage > 1) {
+      fetchComplaints(currentPage - 1)
+    }
 
     notify(res.message)
 
@@ -146,10 +170,18 @@ const Admin = () => {
                     </svg>
                     Delete
                   </button>
-                </article>
-              ))}
-            </div>
-          </section>
+</article>
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            onPrevClick={handlePrevClick}
+            onNextClick={handleNextClick}
+          />
+        </section>
         </main>
       )}
     </div>

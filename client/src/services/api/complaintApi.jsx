@@ -3,11 +3,13 @@ import api from "./axios"
 import { TokenContext } from "../../context/TokenContext";
 
 
-export const getComplaints = async (limit=10, skip=0) => {
+export const COMPLAINTS_PER_PAGE = 10
+
+export const getComplaints = async (limit = COMPLAINTS_PER_PAGE, page = 1) => {
 
   try {
 
-    const data = await api.get(`/complaint/get?limit=${limit}&skip=${skip}`)
+    const data = await api.get(`/complaint/get?limit=${limit}&page=${page}`)
     
     return data.data;
     
