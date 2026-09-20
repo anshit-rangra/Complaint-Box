@@ -1,6 +1,7 @@
 import express from "express"
 import complaintRoutes from "../routes/complaint.routes.js"
 import cors from "cors";
+import config from "../config/config.js";
 
 
 const app = express();
@@ -9,7 +10,7 @@ app.use(express.json())
 
 
 app.use(cors({
-  origin: "https://your-frontend.vercel.app"
+  origin: config.FRONTEND_URI
 }));
 
 app.use("/api/complaint", complaintRoutes)

@@ -4,7 +4,8 @@ dotenv.config();
 
 const config = {
 
-    MONGO_URI: process.env.MONGODB_URI
+    MONGO_URI: process.env.MONGODB_URI,
+    FRONTEND_URI: process.env.FRONTEND_URI
     
 }
 
